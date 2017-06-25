@@ -98,7 +98,7 @@ function enemyCollisionDetection() {
        las[1] + las[3] > ene[1]) {
     enemies.splice(j,1);
     laserParticles.splice(i,1);
-    continue;
+    break;
    }
   }
  }
