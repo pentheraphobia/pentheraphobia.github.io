@@ -19,6 +19,7 @@ for (i=starAmount; i<starMax; i++) {
 
 var upPressed = false;
 var downPressed = false;
+var spacePressed = false;
 
 document.addEventListener("keydown",keyDownHandler,false);
 document.addEventListener("keyup",keyUpHandler,false);
@@ -30,6 +31,9 @@ function keyDownHandler(e) {
  if (e.keyCode == 40) {
   downPressed = true;
  }
+ if (e.keyCode == 32) {
+  spacePressed = true;
+ }
 }
 
 function keyUpHandler(e) {
@@ -38,6 +42,45 @@ function keyUpHandler(e) {
  }
  if (e.keyCode == 40) {
   downPressed = false;
+ }
+ if (e.keyCode == 32) {
+  spacePressed = false;
+ }
+}
+
+var laserTimer = 0;
+var laserParticles = [];
+var laserHeight = 2;
+var laserWidth = 3;
+var laserSpeed = 5;
+
+function fireLaser() {
+ if (laserTimer > 0) {
+  laserTimer -= 1;
+ }
+ if (spacePressed && laserTimer == 0) {
+  var getShipX = shipX+shipWidth;
+  var getShipY = shipY+(shipHeight-laserHeight)/2;
+  laserParticles.push([getShipX,getShipY,1]);
+  laserTimer += 10;
+ }
+}
+
+function drawLasers() {
+ for (i=0; i < laserParticles.length; i++) {
+  if (laserParticles[i][2] == 1) {
+   ctx.beginPath();
+   ctx.rect(laserParticles[i][0],laserParticles[i][1],laserHeight,laserWidth);
+   ctx.fillStyle = "#00FFFF";
+   ctx.fill();
+   ctx.closePath();
+   laserParticles[i][0] += laserSpeed;
+   if (laserParticles[i][0] + laserSpeed >= canvas.width) {
+    laserParticles[i][2] = 0;
+   }
+  } else if (laserParticles[i][2] == 0) {
+   laserParticles.splice(i,1);
+  }
  }
 }
 
@@ -113,10 +156,12 @@ function drawStars() {
 
 function draw() {
  ctx.clearRect(0,0,canvas.width,canvas.height);
- moveShip();
- drawShip();
  generateStars();
  drawStars();
+ fireLaser();
+ drawLasers();
+ moveShip();
+ drawShip();
 
  requestAnimationFrame(draw);
 }
